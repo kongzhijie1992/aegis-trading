@@ -13,3 +13,5 @@ dist/
 coverage.json
 coverage.xml
 audit.json
+
+node_modules/

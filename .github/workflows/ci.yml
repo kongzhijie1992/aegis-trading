@@ -26,7 +26,17 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install poetry==2.3.4
       - run: poetry install --no-interaction
+      - name: Install locked frontend formatting tools
+        run: npm ci --ignore-scripts
+      - name: Check dashboard source formatting
+        run: npm run check:ui-format
+      - name: Audit frontend development dependencies
+        run: npm audit --audit-level=low
       - run: poetry run python scripts/quality.py
+      - name: Install headless browser for dashboard checks
+        run: poetry run playwright install --with-deps chromium
+      - name: Verify dashboard interactions and responsive layout
+        run: poetry run python scripts/check_dashboard_ui.py
       - name: Dependency vulnerability audit (failure blocks merge)
         run: poetry run pip-audit --skip-editable --format json --output audit.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -37,6 +47,7 @@ jobs:
             coverage.json
             coverage.xml
             audit.json
+            dist/dashboard-*.png
           retention-days: 14
 
   test-and-package:

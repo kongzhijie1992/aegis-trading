@@ -78,3 +78,59 @@ local roadmap/tooling candidate.
 
 Future changes must repeat both reviews and relevant retests; this document is
 not a standing approval of future code or a substitute for human PR review.
+
+
+## Dashboard review 1 — correctness and read-only behavior (14 November)
+
+Added monitoring-owned snapshot/history/HTTP presentation and a separate read-only
+account_view in the IBKR adapter. Checked that all broker holdings can be displayed
+without calling or weakening snapshot() trading eligibility. Missing numeric fields
+remain null; nonfinite sentinels are discarded. Header totals use broker base currency;
+position values stay in native currency, and exposure is grouped per currency. NAV
+history is scoped to account/mode/currency and explicitly is not investment return.
+Found that sqlite3 context managers commit but do not close connections on Windows;
+changed all dashboard database uses to explicit closing plus transaction contexts.
+Added regression tests for persistence, stale preservation, host checks and callback
+views. No submit/cancel/approve HTTP route exists; the collector sets writable=False.
+
+## Dashboard review 2 — presentation, packaging and failure states (14 November)
+
+Inspected desktop and mobile screenshots and tested real browser rendering/search,
+chart, CSV download and stale refresh. Fixed a connected badge that could contradict
+an aged snapshot warning. CSV escaping preserves numeric negative holdings while
+neutralizing formula-leading strings. Replaced browser string-evaluation polling
+with locator assertions rather than weakening CSP. Verified release source packaging
+includes HTML, and installed-wheel tests read the actual packaged dashboard asset.
+The HTML has no external scripts, fonts or analytics. Loopback host checking, no-store,
+CSP and frame denial are tested. Demo and actual account histories use separate files.
+All 45 guarded tests, per-library coverage gates, current typing/style checks and the
+dependency audit pass. Browser interactions pass at 1440px and 390px. No actual account
+snapshot was collected because paper TWS was not listening; live-account support and
+hosted access remain outside scope. The prior bootstrap GitHub matrix passed.
+
+
+Dashboard presentation follow-up: mobile screenshot inspection found a crowded
+chart header and wrapping wordmark. Added wrapping gaps and a stable wordmark,
+then repeated responsive browser checks. HTML/CSS/JS source now uses a pinned,
+lockfile-installed Prettier tool; the mandatory quality runner enforces it and
+CI audits its development dependencies. npm audit reports zero vulnerabilities.
+The Python runtime still needs no Node server or external frontend assets.
+
+
+## Paper-account acceptance follow-up — 14 November 2026
+
+Review 1 (refresh correctness): a real read-only paper session exposed a timeout
+when account_view re-requested the account subscription already initialized by
+ib_async.connectAsync. Changed refreshes to use a bounded broker heartbeat and
+the maintained account stream. Startup now raises synchronization errors rather
+than presenting a partially synchronized account. Regression tests verify two
+refreshes never re-subscribe and a failed heartbeat stops collection.
+
+Review 2 (valuation and privacy): real broker account-update tags did not include
+the header realized/unrealized totals. These now use the same base-currency PnL
+subscription as daily PnL, with the account tags as a missing-value fallback. Tests
+cover both sources. Verified actual paper data loads and refreshes, including all
+three nonzero positions, base-account currency, cash and PnL. No account numbers,
+balances, holdings snapshots, private config or history were added to tracked
+files. The local read-only service uses a separate client ID; no orders were sent.
+All 46 guarded tests and local quality/coverage gates passed after the correction.

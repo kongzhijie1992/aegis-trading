@@ -23,6 +23,8 @@ def main():
             ".gitignore",
             ".gitattributes",
             ".editorconfig",
+            "package.json",
+            "package-lock.json",
             "build_libraries.py",
             "verify_wheels.py",
         }
@@ -35,7 +37,7 @@ def main():
             for p in (root / directory).rglob("*")
             if p.is_file()
             and "__pycache__" not in p.parts
-            and p.suffix in (".py", ".md", ".toml", ".typed", ".yml")
+            and p.suffix in (".py", ".md", ".toml", ".typed", ".yml", ".html")
         ]
     archives = [output / "ibkr-paper-trader.zip", output / "ibkr-trading-libraries-wheels.zip"]
     with ZipFile(archives[0], "w", ZIP_DEFLATED) as archive:

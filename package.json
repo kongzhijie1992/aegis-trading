@@ -1,0 +1,10 @@
+{
+  "name": "aegis-dashboard-tooling",
+  "private": true,
+  "scripts": {
+    "check:ui-format": "prettier --check libs/trading-monitoring/src/trading_monitoring/dashboard.html"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

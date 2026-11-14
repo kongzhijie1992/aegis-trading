@@ -124,3 +124,26 @@ Split the implementation into 11 Python distributions with src layouts, individu
 ## Component plans and CI gates — 13 November 2026
 
 Added one three-milestone plan for each of 11 libraries, engineering/architecture rules, pinned GitHub Actions candidate workflow and explicit remote activation limits. Local quality gates include lock check, Ruff, strict mypy for five core libraries, dependency graph rules, workflow security invariants, guarded tests, and at least 90% statement/branch coverage for every library (95% required for risk/execution). All 41 tests passed; risk and execution reached 100%, adapter 94.19%, engine 90%. pip-audit reported no known vulnerabilities. Rebuilt wheels passed hash/version/metadata/typing-marker verification and clean installed tests. Two separate self-review passes and their fixes are recorded in SELF_REVIEW.md. Remote CI was not run because no Git repository/remote is configured.
+
+
+## Read-only portfolio dashboard — 14 November 2026
+
+Implemented a monitoring-library dashboard with an application collector, synthetic
+demo and read-only IBKR paper mode. All 45 tests passed in the workspace and from
+clean installed wheels; the dashboard HTML was packaged and served by installed
+tests. Real Chromium checks passed for rendering/chart, search, export, mobile layout
+and stale-state preservation. All quality/coverage gates pass; dependency audit found
+no known vulnerabilities. TWS was not listening on 7497, so the new real-account view
+is verified by a transport fake, not a new account-connected acceptance run. The
+original bootstrap GitHub CI run 43593187742 completed successfully.
+
+
+## Actual paper-dashboard connection — 14 November 2026
+
+Verified an exact-account read-only TWS connection on localhost port 7497 using
+a separate dashboard client. Repeated snapshots loaded three nonzero positions,
+base-currency account value/cash, and daily/unrealized/realized PnL; zero open
+orders were displayed. Fixed duplicate account subscription refreshes and added
+heartbeat and PnL-source regression cases. All 46 guarded tests and library gates
+passed. Sensitive account data and local configuration remain in ignored runtime
+files. No orders or other brokerage mutations were submitted.
