@@ -48,6 +48,7 @@ class PaperBroker:
             timeout=8,
             readonly=not self.writable,
             account=self.config.account,
+            raiseSyncErrors=True,
         )
         self.guard()
         self.ib.reqMarketDataType(1)
@@ -170,7 +171,10 @@ class PaperBroker:
     async def account_view(self):
         """Read-only display of all assets; never relaxes snapshot() trading gates."""
         self.guard()
-        await asyncio.wait_for(self.ib.reqAccountUpdatesAsync(self.config.account), 10)
+        # connectAsync synchronizes and subscribes to account updates once.
+        # Re-subscribing to the same account need not produce another download-end
+        # callback in TWS, so use a bounded heartbeat and the maintained stream.
+        await asyncio.wait_for(self.ib.reqCurrentTimeAsync(), 10)
         values = self.ib.accountValues(self.config.account)
         portfolio = self.ib.portfolio(self.config.account)
         orders = await asyncio.wait_for(self.ib.reqAllOpenOrdersAsync(), 10)
@@ -204,6 +208,8 @@ class PaperBroker:
                     break
                 await asyncio.sleep(0.1)
             daily = number(pnl.dailyPnL)
+            unrealized = number(getattr(pnl, "unrealizedPnL", None))
+            realized = number(getattr(pnl, "realizedPnL", None))
         finally:
             self.ib.cancelPnL(self.config.account)
         self.guard()
@@ -239,8 +245,8 @@ class PaperBroker:
             "net_liquidation": amount("NetLiquidation"),
             "cash": amount("TotalCashValue"),
             "daily_pnl": daily,
-            "unrealized_pnl": amount("UnrealizedPnL"),
-            "realized_pnl": amount("RealizedPnL"),
+            "unrealized_pnl": unrealized if unrealized is not None else amount("UnrealizedPnL"),
+            "realized_pnl": realized if realized is not None else amount("RealizedPnL"),
             "positions": positions,
             "orders": [
                 {

@@ -115,3 +115,22 @@ then repeated responsive browser checks. HTML/CSS/JS source now uses a pinned,
 lockfile-installed Prettier tool; the mandatory quality runner enforces it and
 CI audits its development dependencies. npm audit reports zero vulnerabilities.
 The Python runtime still needs no Node server or external frontend assets.
+
+
+## Paper-account acceptance follow-up — 14 November 2026
+
+Review 1 (refresh correctness): a real read-only paper session exposed a timeout
+when account_view re-requested the account subscription already initialized by
+ib_async.connectAsync. Changed refreshes to use a bounded broker heartbeat and
+the maintained account stream. Startup now raises synchronization errors rather
+than presenting a partially synchronized account. Regression tests verify two
+refreshes never re-subscribe and a failed heartbeat stops collection.
+
+Review 2 (valuation and privacy): real broker account-update tags did not include
+the header realized/unrealized totals. These now use the same base-currency PnL
+subscription as daily PnL, with the account tags as a missing-value fallback. Tests
+cover both sources. Verified actual paper data loads and refreshes, including all
+three nonzero positions, base-account currency, cash and PnL. No account numbers,
+balances, holdings snapshots, private config or history were added to tracked
+files. The local read-only service uses a separate client ID; no orders were sent.
+All 46 guarded tests and local quality/coverage gates passed after the correction.

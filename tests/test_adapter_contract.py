@@ -167,6 +167,8 @@ class AdapterContractTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_readonly_account_view_displays_mixed_assets_without_relaxing_risk(self):
         self.ib.reqAccountUpdatesAsync = AsyncMock()
+        self.ib.reqCurrentTimeAsync = AsyncMock(return_value=datetime.now(UTC))
+        self.ib.reqPnL.return_value = NS(dailyPnL=0, unrealizedPnL=12, realizedPnL=3)
         self.ib.accountValues = lambda _: [
             NS(tag="Currency", currency="BASE", value="USD"),
             NS(tag="NetLiquidation", currency="USD", value="10000"),
@@ -208,7 +210,17 @@ class AdapterContractTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(result["cash"])
         self.assertEqual(len(result["orders"]), 1)
         self.assertFalse(self.broker.writable)
+        self.assertEqual(result["unrealized_pnl"], 12)
+        self.assertEqual(result["realized_pnl"], 3)
+        self.ib.reqPnL.return_value = NS(dailyPnL=0)
         self.ib.accountValues = lambda _: [NS(tag="NetLiquidation", currency="GBP", value="1e300")]
         fallback = await self.broker.account_view()
         self.assertEqual(fallback["currency"], "GBP")
         self.assertIsNone(fallback["net_liquidation"])
+        self.assertEqual(self.ib.reqCurrentTimeAsync.await_count, 2)
+        self.ib.reqAccountUpdatesAsync.assert_not_awaited()
+
+    async def test_account_view_stops_on_failed_heartbeat(self):
+        self.ib.reqCurrentTimeAsync = AsyncMock(side_effect=TimeoutError("heartbeat"))
+        with self.assertRaises(TimeoutError):
+            await self.broker.account_view()
