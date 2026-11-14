@@ -1,10 +1,13 @@
 [project]
 name = "trading-strategy"
-version = "0.1.0"
+version = "0.2.0"
 description = "Pure signal generation"
 requires-python = ">=3.12,<3.15"
 readme = "README.md"
 dependencies = ["trading-contracts==0.1.0"]
+
+[project.scripts]
+aegis-signals = "trading_strategy.cli:main"
 
 [tool.poetry]
 packages = [{include = "trading_strategy", from = "src"}]

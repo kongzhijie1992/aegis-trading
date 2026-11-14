@@ -147,3 +147,16 @@ orders were displayed. Fixed duplicate account subscription refreshes and added
 heartbeat and PnL-source regression cases. All 46 guarded tests and library gates
 passed. Sensitive account data and local configuration remain in ignored runtime
 files. No orders or other brokerage mutations were submitted.
+
+
+## Offline signal research — 14 November 2026
+
+Added typed signal/frame contracts, pure close features, three fixed example models,
+registry, shared output validation, explicit Strategy adapter, CSV loader, purged
+chronological forward-return evaluation and the aegis-signals CLI. Research stays
+inside trading-strategy and has no broker/execution dependency. All 55 guarded tests
+and current library/type/style gates pass. Strategy coverage exceeds 99%. Clean
+strategy-only installation and full installed-wheel tests pass, including CLI module
+execution. A synthetic 234-bar workflow was run successfully; its results are not
+profitability evidence. Built wheels now contain trading-strategy 0.2.0 and application
+0.3.0. Existing account dashboard service and trading defaults were not changed.

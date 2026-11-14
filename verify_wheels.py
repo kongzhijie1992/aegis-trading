@@ -75,6 +75,7 @@ def main():
             "-c",
             "import importlib.util; from trading_strategy import SmaStrategy; assert importlib.util.find_spec('ib_async') is None; assert importlib.util.find_spec('paper_trader') is None; print('Strategy installs without broker SDK or application')",
         )
+        run(minimal, "-m", "trading_strategy.cli", "list")
         full = create("full")
         run(
             full,

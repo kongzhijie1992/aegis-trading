@@ -82,10 +82,10 @@ python build_libraries.py
 # Produces dist/wheels/<distribution>-<version>-py3-none-any.whl.
 
 # In another Python 3.12+ virtual environment, install only signal research:
-python -m pip install --no-index --find-links dist/wheels trading-strategy==0.1.0
+python -m pip install --no-index --find-links dist/wheels trading-strategy==0.2.0
 
 # Or install the full application, including the local libraries:
-python -m pip install --no-index --find-links dist/wheels ibkr-paper-trader==0.2.0
+python -m pip install --no-index --find-links dist/wheels ibkr-paper-trader==0.3.0
 ```
 
 The full offline installation also needs third-party wheels (ib_async, its
@@ -102,7 +102,8 @@ package install expecting these exact libraries to exist there.
 
 ## Versioning and tests
 
-Library versions start at 0.1.0; the application is 0.2.0. A library can be
+Signal research brings trading-strategy to 0.2.0 and the application to 0.3.0;
+other library versions remain at 0.1.0. A library can be
 released independently by changing its version and updating affected sibling
 constraints. Keep shared-contract changes compatible or coordinate version bumps.
 This initial implementation pins sibling versions exactly to avoid silent drift.

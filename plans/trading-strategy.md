@@ -37,3 +37,5 @@ Use the ports/adapters, constructor injection, explicit errors and style rules i
 ## Delivery gate
 
 Run the complete quality and installed-wheel suites. The library must meet at least 90% combined statement/branch coverage, pass the applicable strict type checks, and have no unresolved correctness/safety review finding. Review dependency constraints and semantic versioning before releasing only the affected distribution and its compatible dependents. Never publish private data or introduce live trading.
+
+Signal research update: SignalModel/SignalRecord, registry, features, shared validation and purged offline studies are now implemented in version 0.2.0. Walk-forward fitting, statistical inference and portfolio backtesting remain planned. See SIGNAL_DEVELOPMENT.md.
