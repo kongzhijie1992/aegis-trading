@@ -1,0 +1,14 @@
+[project]
+name = "trading-marketdata"
+version = "0.1.0"
+description = "Provider-neutral price data access and validation"
+requires-python = ">=3.12,<3.15"
+readme = "README.md"
+dependencies = ["trading-contracts==0.1.0"]
+
+[tool.poetry]
+packages = [{include = "trading_marketdata", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

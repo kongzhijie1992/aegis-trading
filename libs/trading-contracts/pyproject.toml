@@ -1,0 +1,14 @@
+[project]
+name = "trading-contracts"
+version = "0.1.0"
+description = "Shared immutable models and protocols"
+requires-python = ">=3.12,<3.15"
+readme = "README.md"
+dependencies = []
+
+[tool.poetry]
+packages = [{include = "trading_contracts", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

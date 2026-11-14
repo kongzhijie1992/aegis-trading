@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+config.local.json
+runtime/
+
+dist/
+*.egg-info/
+
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.json
+coverage.xml
+audit.json

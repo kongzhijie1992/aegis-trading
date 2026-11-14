@@ -1,0 +1,14 @@
+[project]
+name = "trading-monitoring"
+version = "0.1.0"
+description = "Durable audit trail and operational logging"
+requires-python = ">=3.12,<3.15"
+readme = "README.md"
+dependencies = []
+
+[tool.poetry]
+packages = [{include = "trading_monitoring", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

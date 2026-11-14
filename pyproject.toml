@@ -1,0 +1,67 @@
+[project]
+name = "ibkr-paper-trader"
+version = "0.2.0"
+description = "Composition application for independent paper trading libraries"
+authors = [{name = "Local user"}]
+requires-python = ">=3.12,<3.15"
+dependencies = ["trading-contracts==0.1.0", "trading-marketdata==0.1.0", "trading-strategy==0.1.0", "trading-portfolio==0.1.0", "trading-risk==0.1.0", "trading-approval==0.1.0", "trading-monitoring==0.1.0", "trading-execution==0.1.0", "trading-simulation==0.1.0", "trading-ibkr==0.1.0", "trading-engine==0.1.0"]
+
+[project.scripts]
+paper-trader = "paper_trader.cli:main"
+
+[tool.poetry]
+packages = [{include = "paper_trader"}]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.15"
+trading-contracts = {path = "libs/trading-contracts", develop = true}
+trading-marketdata = {path = "libs/trading-marketdata", develop = true}
+trading-strategy = {path = "libs/trading-strategy", develop = true}
+trading-portfolio = {path = "libs/trading-portfolio", develop = true}
+trading-risk = {path = "libs/trading-risk", develop = true}
+trading-approval = {path = "libs/trading-approval", develop = true}
+trading-monitoring = {path = "libs/trading-monitoring", develop = true}
+trading-execution = {path = "libs/trading-execution", develop = true}
+trading-simulation = {path = "libs/trading-simulation", develop = true}
+trading-ibkr = {path = "libs/trading-ibkr", develop = true}
+trading-engine = {path = "libs/trading-engine", develop = true}
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["runtime", "dist"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = [
+  "libs/trading-contracts/src/trading_contracts",
+  "libs/trading-marketdata/src/trading_marketdata",
+  "libs/trading-strategy/src/trading_strategy",
+  "libs/trading-portfolio/src/trading_portfolio",
+  "libs/trading-risk/src/trading_risk",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["trading_contracts", "trading_marketdata", "trading_strategy", "trading_portfolio", "trading_risk", "trading_execution", "trading_engine", "trading_simulation", "trading_monitoring", "trading_approval", "trading_ibkr"]
+
+[tool.coverage.report]
+show_missing = true
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.17.5,<0.18.0)",
+    "mypy (>=2.4.1,<3.0.0)",
+    "coverage (>=7.17.3,<8.0.0)",
+    "pip-audit (>=2.10.1,<3.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "types-pyyaml (>=6.0.12.20261113,<7.0.0.0)"
+]
