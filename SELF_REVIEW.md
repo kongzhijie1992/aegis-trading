@@ -134,3 +134,34 @@ three nonzero positions, base-account currency, cash and PnL. No account numbers
 balances, holdings snapshots, private config or history were added to tracked
 files. The local read-only service uses a separate client ID; no orders were sent.
 All 46 guarded tests and local quality/coverage gates passed after the correction.
+
+
+## Signal framework review 1 — decision and label integrity (14 November)
+
+Reviewed every frame/model/label boundary. Consolidated custom-output validation
+so research and the explicit Strategy adapter reject wrong symbols/model IDs,
+invalid/expired timestamps, nonfinite features/scores and invalid long/flat targets
+through the same function. Verified completed-bar and future-data invariance.
+Training labels reaching the test period are purged; next-completed-close entry
+and horizon exit are checked against known prices, with round-trip cost subtraction.
+Gapped forward intervals are excluded. Reports explicitly describe overlapping
+opportunities, not portfolio P&L. No fitting or execution path was introduced.
+Found and fixed a run-ID collision risk for identical prices labelled with different
+symbols by including symbol and generated observations in provenance. Added tests
+for those IDs and for corrupted custom outputs. All 55 guarded tests pass.
+
+## Signal framework review 2 — reproducibility, scaling and packaging (14 November)
+
+Changed evaluator inputs from growing historical prefixes to declared lookback
+windows, avoiding quadratic prefix scans while still excluding future data. Added
+Python/library versions and a CLI dataset-before/after hash check, with a regression
+case that rejects changed input. Verified a minimal installed strategy wheel can
+run the research CLI without IBKR or the application; full installed-wheel tests
+also pass. Bumped trading-strategy to 0.2.0 and the composition app to 0.3.0 and
+updated the lock and dependent constraints; existing trading defaults are unchanged.
+The model is a directional feature, not calibrated confidence; costs, overlap and
+holdout-reuse limitations are explicit. The adapter checks TTL at decision time,
+but the existing integer-target engine does not propagate SignalRecord expiry to
+submission; this is documented as a future integration requirement rather than
+claiming end-to-end expiry enforcement. Both reviews found no remaining blocker
+for the offline research scope. No account data or research outputs are committed.

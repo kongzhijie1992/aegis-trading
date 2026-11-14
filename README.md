@@ -1,5 +1,8 @@
 # Aegis Trading
 
+Signal development: [SIGNAL_DEVELOPMENT.md](SIGNAL_DEVELOPMENT.md). Try the offline
+workflow with `poetry run aegis-signals demo --output runtime/signals/demo`.
+
 Portfolio dashboard: [DASHBOARD.md](DASHBOARD.md). Run
 `poetry run paper-trader dashboard --source demo` for a local preview, or
 `--source ibkr --config config.local.json` for the read-only paper account.

@@ -1729,7 +1729,7 @@ url = "libs/trading-simulation"
 
 [[package]]
 name = "trading-strategy"
-version = "0.1.0"
+version = "0.2.0"
 description = "Pure signal generation"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1801,4 +1801,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.15"
-content-hash = "84525583ec1e99074606cfd4575464429257492eba90e7cfbf24810767c6c582"
+content-hash = "ef4a0e6a90c65b934d4853b79695f0ca536979c2de9dd003662378a00231490c"
