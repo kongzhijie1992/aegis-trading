@@ -80,6 +80,10 @@ poetry run playwright install chromium
 poetry run python scripts/check_dashboard_ui.py
 ```
 
+The development environment also uses Node.js for a pinned Prettier formatter:
+run `npm ci --ignore-scripts` before the quality checks. The dashboard runtime
+itself uses only Python and browser-native HTML/CSS/JavaScript.
+
 Transport-fake tests cover the paper account view without real connections.
 Dashboard tests cover persistence, account/mode/currency isolation, invalid numbers,
 host rejection, read-only routes and stale-state preservation. Browser checks cover

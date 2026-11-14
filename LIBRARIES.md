@@ -21,8 +21,8 @@ need separate Git repositories to be separately installable or versioned.
 | trading-engine | trading_engine | Composition and independent diagnostic checks |
 
 The backtesting/simulation component currently supplies an execution simulator,
-not a historical profitability backtester. Monitoring currently supplies journal
-and logs, not a dashboard. Market data supplies access and validation, not a
+not a historical profitability backtester. Monitoring now supplies journal, logs and a read-only local portfolio dashboard;
+see DASHBOARD.md. Market data supplies access and validation, not a
 production historical-data warehouse. Those capabilities can be developed inside
 their respective libraries without folding them back into the application.
 

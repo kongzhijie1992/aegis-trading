@@ -23,6 +23,8 @@ def main():
             ".gitignore",
             ".gitattributes",
             ".editorconfig",
+            "package.json",
+            "package-lock.json",
             "build_libraries.py",
             "verify_wheels.py",
         }

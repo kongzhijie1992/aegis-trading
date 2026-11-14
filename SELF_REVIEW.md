@@ -107,3 +107,11 @@ All 45 guarded tests, per-library coverage gates, current typing/style checks an
 dependency audit pass. Browser interactions pass at 1440px and 390px. No actual account
 snapshot was collected because paper TWS was not listening; live-account support and
 hosted access remain outside scope. The prior bootstrap GitHub matrix passed.
+
+
+Dashboard presentation follow-up: mobile screenshot inspection found a crowded
+chart header and wrapping wordmark. Added wrapping gaps and a stable wordmark,
+then repeated responsive browser checks. HTML/CSS/JS source now uses a pinned,
+lockfile-installed Prettier tool; the mandatory quality runner enforces it and
+CI audits its development dependencies. npm audit reports zero vulnerabilities.
+The Python runtime still needs no Node server or external frontend assets.

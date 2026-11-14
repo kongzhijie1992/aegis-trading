@@ -30,7 +30,9 @@
 
 ```powershell
 poetry install
+npm ci --ignore-scripts
 poetry run python scripts/quality.py
+npm audit --audit-level=low
 poetry run pip-audit --skip-editable --format json --output audit.json
 python build_libraries.py
 poetry run python scripts/download_wheels.py
@@ -95,4 +97,4 @@ in the correct `.github/workflows/` location. Its first remote execution, branch
 protection and reviewer rules are still pending; having a remote does not prove
 those controls are active. Push the reviewed bootstrap change, then require the
 complete matrix and aggregate `required` check before treating CI as active.
-Only Windows/Python 3.12 has been verified locally so far.
+The bootstrap GitHub matrix passed on Linux/Windows and Python 3.12–3.14 in run 43593187742. The dashboard PR has its own required CI run; branch protection and reviewer configuration still need verification.

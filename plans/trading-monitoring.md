@@ -2,7 +2,7 @@
 
 ## Current boundary
 
-SQLite Journal and bounded rotating application logs.
+SQLite Journal, bounded rotating application logs, and a read-only local portfolio dashboard with snapshot history.
 
 The current starter is implemented; the milestones below are planned work, not completed features.
 
@@ -20,7 +20,7 @@ Acceptance: deterministic integration fixtures demonstrate normal, failed and in
 
 ## Milestone 3 — operational readiness
 
-Add optional metrics and a read-only dashboard without introducing trading mutations into reporting.
+Extend the implemented read-only dashboard with optional metrics and structured event drill-down, without introducing trading mutations into reporting.
 
 Acceptance: install the candidate wheel outside the source tree, demonstrate recovery/compatibility, document residual limits, and complete both reviews before release.
 
