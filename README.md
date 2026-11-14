@@ -1,5 +1,9 @@
 # Aegis Trading
 
+Portfolio dashboard: [DASHBOARD.md](DASHBOARD.md). Run
+`poetry run paper-trader dashboard --source demo` for a local preview, or
+`--source ibkr --config config.local.json` for the read-only paper account.
+
 A modular Python trading platform, starting with manually approved IBKR paper
 trading. Research, market data, portfolio accounting, risk and execution are
 independent libraries in one repository. Live trading and hosted deployment are

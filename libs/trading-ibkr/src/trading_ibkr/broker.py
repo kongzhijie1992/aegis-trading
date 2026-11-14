@@ -167,6 +167,99 @@ class PaperBroker:
             sum(not t.isDone() for t in orders),
         )
 
+    async def account_view(self):
+        """Read-only display of all assets; never relaxes snapshot() trading gates."""
+        self.guard()
+        await asyncio.wait_for(self.ib.reqAccountUpdatesAsync(self.config.account), 10)
+        values = self.ib.accountValues(self.config.account)
+        portfolio = self.ib.portfolio(self.config.account)
+        orders = await asyncio.wait_for(self.ib.reqAllOpenOrdersAsync(), 10)
+        currency = next(
+            (v.value for v in values if v.tag == "Currency" and v.currency == "BASE"), None
+        )
+        if not currency:
+            currency = next((v.currency for v in values if v.tag == "NetLiquidation"), "BASE")
+
+        def number(value):
+            try:
+                value = float(value)
+                return value if math.isfinite(value) and abs(value) < 1e100 else None
+            except (ValueError, TypeError):
+                return None
+
+        def amount(tag):
+            return next(
+                (
+                    number(v.value)
+                    for v in values
+                    if v.tag == tag and v.currency in (currency, "BASE")
+                ),
+                None,
+            )
+
+        pnl = self.ib.reqPnL(self.config.account)
+        try:
+            for _ in range(50):
+                if number(pnl.dailyPnL) is not None:
+                    break
+                await asyncio.sleep(0.1)
+            daily = number(pnl.dailyPnL)
+        finally:
+            self.ib.cancelPnL(self.config.account)
+        self.guard()
+        positions = []
+        for item in portfolio:
+            if item.account != self.config.account or not item.position:
+                continue
+            contract = item.contract
+            instrument = contract.secType
+            if contract.secType == "OPT":
+                instrument += (
+                    f" {contract.lastTradeDateOrContractMonth} {contract.strike} {contract.right}"
+                )
+            positions.append(
+                {
+                    "symbol": contract.symbol,
+                    "instrument": instrument,
+                    "quantity": number(item.position),
+                    "currency": contract.currency,
+                    "market_price": number(item.marketPrice),
+                    "market_value": number(item.marketValue),
+                    "average_cost": number(item.averageCost),
+                    "unrealized_pnl": number(item.unrealizedPNL),
+                    "realized_pnl": number(item.realizedPNL),
+                }
+            )
+        return {
+            "mode": "paper",
+            "status": "connected",
+            "account": self.config.account,
+            "currency": currency,
+            "as_of": datetime.now(UTC).isoformat(),
+            "net_liquidation": amount("NetLiquidation"),
+            "cash": amount("TotalCashValue"),
+            "daily_pnl": daily,
+            "unrealized_pnl": amount("UnrealizedPnL"),
+            "realized_pnl": amount("RealizedPnL"),
+            "positions": positions,
+            "orders": [
+                {
+                    "symbol": t.contract.symbol,
+                    "side": t.order.action,
+                    "quantity": number(t.order.totalQuantity),
+                    "filled": number(t.orderStatus.filled),
+                    "status": t.orderStatus.status,
+                    "type": t.order.orderType,
+                }
+                for t in orders
+                if not t.isDone() and t.order.account in ("", self.config.account)
+            ],
+            "notes": [
+                "Broker marks can be delayed or from the last session. No trading permissions implied.",
+                "Option average cost uses the broker contract convention; do not compare it directly with an option quote.",
+            ],
+        }
+
     async def send_approved(self, proposal):
         from ib_async import LimitOrder
 

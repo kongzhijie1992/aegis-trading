@@ -24,6 +24,11 @@ async def demo(journal):
 
 
 async def run(args, journal):
+    if args.command == "dashboard":
+        from .dashboard import run_dashboard
+
+        await run_dashboard(args)
+        return
     if args.command == "demo":
         await demo(journal)
         return
@@ -75,9 +80,12 @@ async def run(args, journal):
 def main():
     parser = argparse.ArgumentParser(description="Paper-only IBKR system; no live mode")
     parser.add_argument(
-        "command", choices=("demo", "check", "trade", "journal", "reconcile", "simulate")
+        "command",
+        choices=("demo", "check", "trade", "journal", "reconcile", "simulate", "dashboard"),
     )
     parser.add_argument("--config", default="config.local.json")
+    parser.add_argument("--source", choices=("demo", "ibkr"), default="demo")
+    parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--key")
     parser.add_argument("--status", choices=("Filled", "Cancelled", "Rejected"))
     parser.add_argument("--fast", type=int, default=20)
@@ -85,7 +93,13 @@ def main():
     args = parser.parse_args()
     Path("runtime").mkdir(exist_ok=True)
     configure_logging("runtime/app.log")
-    runtime = Path("runtime/simulation") if args.command == "simulate" else Path("runtime")
+    runtime = (
+        Path("runtime/simulation")
+        if args.command == "simulate"
+        else Path("runtime/dashboard")
+        if args.command == "dashboard"
+        else Path("runtime")
+    )
     runtime.mkdir(parents=True, exist_ok=True)
     if args.command == "simulate":
         from uuid import uuid4

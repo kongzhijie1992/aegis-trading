@@ -164,3 +164,51 @@ class AdapterContractTests(unittest.IsolatedAsyncioTestCase):
         trade.statusEvent.emit(trade)
         trade.fillEvent.emit(trade, NS(execution=NS(execId="fixture", shares=1, price=500)))
         self.assertEqual(self.journal.unresolved(), [])
+
+    async def test_readonly_account_view_displays_mixed_assets_without_relaxing_risk(self):
+        self.ib.reqAccountUpdatesAsync = AsyncMock()
+        self.ib.accountValues = lambda _: [
+            NS(tag="Currency", currency="BASE", value="USD"),
+            NS(tag="NetLiquidation", currency="USD", value="10000"),
+            NS(tag="TotalCashValue", currency="USD", value="bad"),
+        ]
+        stock = NS(symbol="GSPX", secType="STK", currency="GBP")
+        option = NS(
+            symbol="NVDA",
+            secType="OPT",
+            currency="USD",
+            lastTradeDateOrContractMonth="20261120",
+            strike=180,
+            right="C",
+        )
+        self.ib.portfolio = lambda _: [
+            NS(
+                account="DU123",
+                contract=c,
+                position=q,
+                marketPrice=10,
+                marketValue=q * 10,
+                averageCost=11,
+                unrealizedPNL=-1,
+                realizedPNL=0,
+            )
+            for c, q in [(stock, 1), (option, -1), (stock, 0)]
+        ]
+        trade = NS(
+            contract=stock,
+            order=NS(account="DU123", action="BUY", totalQuantity=1, orderType="LMT"),
+            orderStatus=NS(filled=0, status="Submitted"),
+            isDone=lambda: False,
+        )
+        self.ib.reqAllOpenOrdersAsync = AsyncMock(return_value=[trade])
+        result = await self.broker.account_view()
+        self.assertEqual(len(result["positions"]), 2)
+        self.assertEqual(result["positions"][1]["quantity"], -1)
+        self.assertEqual(result["net_liquidation"], 10000)
+        self.assertIsNone(result["cash"])
+        self.assertEqual(len(result["orders"]), 1)
+        self.assertFalse(self.broker.writable)
+        self.ib.accountValues = lambda _: [NS(tag="NetLiquidation", currency="GBP", value="1e300")]
+        fallback = await self.broker.account_view()
+        self.assertEqual(fallback["currency"], "GBP")
+        self.assertIsNone(fallback["net_liquidation"])
