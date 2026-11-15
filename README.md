@@ -1,5 +1,9 @@
 # Aegis Trading
 
+Fundamental and macro database: [DATA_PLATFORM.md](DATA_PLATFORM.md). Inspect local
+data with `poetry run aegis-data inventory`; ingestion and backups are separate
+from the broker and order-approval process.
+
 Signal development: [SIGNAL_DEVELOPMENT.md](SIGNAL_DEVELOPMENT.md). Try the offline
 workflow with `poetry run aegis-signals demo --output runtime/signals/demo`.
 
@@ -18,7 +22,7 @@ Two-pass review record: [SELF_REVIEW.md](SELF_REVIEW.md).
 
 
 
-The components are now **11 independently installable Python libraries** under
+The components are now **12 independently installable Python libraries** under
 
 `libs/`, each with its own project metadata and wheel. Start with
 

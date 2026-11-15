@@ -15,7 +15,7 @@
   Ruff E4/E7/E9/F/I/B/UP rules are mandatory; no blanket noqa or ignored failures.
 - New or changed public APIs require type annotations and documented failure
   semantics. Strict mypy is currently enforced for contracts, marketdata,
-  strategy, portfolio and risk (11 source files). The other six async/integration
+  strategy, portfolio, risk and data (21 source files). The other six async/integration
   libraries are not yet fully type-checked; their plans require incremental
   migration without Any-only stubs or blanket ignore flags.
 - Time is timezone-aware UTC at boundaries. New monetary accounting uses Decimal
@@ -42,7 +42,7 @@ python verify_wheels.py
 The quality runner is fail-fast: lock/metadata validation, lint, format check,
 strict typing in the stated packages, AST dependency rules, workflow invariants,
 network-blocked tests, coverage reports and per-library thresholds. Coverage
-includes branches and all eleven libraries; nothing is omitted to pass a gate.
+includes branches and all twelve libraries; nothing is omitted to pass a gate.
 Risk/execution require 95%, every other library 90%. The CLI and build scripts are
 linted but are not included in the library coverage denominator.
 

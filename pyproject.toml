@@ -1,10 +1,10 @@
 [project]
 name = "ibkr-paper-trader"
-version = "0.3.0"
+version = "0.4.0"
 description = "Composition application for independent paper trading libraries"
 authors = [{name = "Local user"}]
 requires-python = ">=3.12,<3.15"
-dependencies = ["trading-contracts==0.1.0", "trading-marketdata==0.1.0", "trading-strategy==0.2.0", "trading-portfolio==0.1.0", "trading-risk==0.1.0", "trading-approval==0.1.0", "trading-monitoring==0.1.0", "trading-execution==0.1.0", "trading-simulation==0.1.0", "trading-ibkr==0.1.0", "trading-engine==0.1.0"]
+dependencies = ["trading-data==0.1.0", "trading-contracts==0.1.0", "trading-marketdata==0.1.0", "trading-strategy==0.2.0", "trading-portfolio==0.1.0", "trading-risk==0.1.0", "trading-approval==0.1.0", "trading-monitoring==0.1.0", "trading-execution==0.1.0", "trading-simulation==0.1.0", "trading-ibkr==0.1.0", "trading-engine==0.1.0"]
 
 [project.scripts]
 paper-trader = "paper_trader.cli:main"
@@ -13,6 +13,7 @@ paper-trader = "paper_trader.cli:main"
 packages = [{include = "paper_trader"}]
 
 [tool.poetry.dependencies]
+trading-data = {path = "libs/trading-data", develop = true}
 python = ">=3.12,<3.15"
 trading-contracts = {path = "libs/trading-contracts", develop = true}
 trading-marketdata = {path = "libs/trading-marketdata", develop = true}
@@ -42,6 +43,7 @@ select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
 python_version = "3.12"
 strict = true
 files = [
+  "libs/trading-data/src/trading_data",
   "libs/trading-contracts/src/trading_contracts",
   "libs/trading-marketdata/src/trading_marketdata",
   "libs/trading-strategy/src/trading_strategy",
@@ -51,7 +53,7 @@ files = [
 
 [tool.coverage.run]
 branch = true
-source = ["trading_contracts", "trading_marketdata", "trading_strategy", "trading_portfolio", "trading_risk", "trading_execution", "trading_engine", "trading_simulation", "trading_monitoring", "trading_approval", "trading_ibkr"]
+source = ["trading_data", "trading_contracts", "trading_marketdata", "trading_strategy", "trading_portfolio", "trading_risk", "trading_execution", "trading_engine", "trading_simulation", "trading_monitoring", "trading_approval", "trading_ibkr"]
 
 [tool.coverage.report]
 show_missing = true

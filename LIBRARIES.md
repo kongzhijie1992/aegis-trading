@@ -1,6 +1,6 @@
 # Independently installable Python libraries
 
-The repository contains **11 separate Python distributions**, plus the small
+The repository contains **12 separate Python distributions**, plus the small
 `ibkr-paper-trader` composition application. Each library has its own
 `pyproject.toml`, version, `src/` directory, README, dependencies and wheel.
 They share one repository for convenient coordinated development; they do not
@@ -8,6 +8,7 @@ need separate Git repositories to be separately installable or versioned.
 
 | Distribution | Python import | Responsibility |
 |---|---|---|
+| trading-data | trading_data | Local fundamental/macro ingestion, immutable revisions, as-of queries |
 | trading-contracts | trading_contracts | Immutable data models, paper configuration, protocols |
 | trading-marketdata | trading_marketdata | Provider-neutral access and data validation |
 | trading-strategy | trading_strategy | Configurable SMA signals, no broker dependency |
@@ -34,6 +35,7 @@ portfolio + contracts ← simulation
 risk + approval + contracts ← execution
 execution + marketdata + portfolio + risk + contracts ← engine
 monitoring: standard-library-only audit/logging implementation
+data: SQLite + provider adapters; tzdata for release-date proxies, no trading dependencies
 
 composition app → selects libraries and wires them together
 ```

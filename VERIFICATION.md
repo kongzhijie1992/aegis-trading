@@ -160,3 +160,23 @@ strategy-only installation and full installed-wheel tests pass, including CLI mo
 execution. A synthetic 234-bar workflow was run successfully; its results are not
 profitability evidence. Built wheels now contain trading-strategy 0.2.0 and application
 0.3.0. Existing account dashboard service and trading defaults were not changed.
+
+## Local fundamental/macro storage — 15 November 2026
+
+Added independently installable trading-data 0.1.0 and composition app 0.4.0.
+Local quality gates pass: 72 network-blocked tests, strict typing, boundaries,
+format/lint, workflow rules and all 12 per-library coverage thresholds. The new
+library reaches 99.15% combined statement/branch coverage. Both Python and frontend
+dependency audits report no known vulnerabilities; clean wheel installation tests
+pass outside the source tree, including SDK-free standalone data CLI usage.
+
+Initialized the ignored local SQLite database and downloaded five real current
+FRED series (DGS10, UNRATE, CPIAUCSL, GDP, FEDFUNDS), totaling 20,014 observations.
+Verified as-of results, zero inserted rows on an unchanged repeat download, and
+an online backup reopened with all five series. Synthetic macro/fundamental data
+is in a separate ignored demo database. These current snapshots are not historical
+vintage evidence. SEC normalization and FRED/ALFRED vintage ingestion are verified
+with offline fixtures; account-local SEC_USER_AGENT and FRED_API_KEY are absent,
+so authenticated/contact-configured provider acceptance remains pending. No
+fundamental live download or complete historical coverage is claimed. No broker
+orders, subscriptions or account settings were changed.
