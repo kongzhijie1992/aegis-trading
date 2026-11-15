@@ -47,11 +47,13 @@ async def run(args, journal):
         broker = SimulatedBroker(clock)
         print("OFFLINE FIXTURE: synthetic prices, virtual cash, no IBKR connection.")
     else:
-        from .broker import PaperBroker
+        from trading_ibkr import LiveBroker, PaperBroker
 
-        config = Config(**json.loads(Path(args.config).read_text()))
-        config.validate()
-        broker = PaperBroker(config, journal, writable=args.command == "trade")
+        from .environments import load_config
+
+        config = load_config(args)
+        broker_type = LiveBroker if config.mode == "live" else PaperBroker
+        broker = broker_type(config, journal, writable=args.command == "trade")
     strategy = SmaStrategy(args.fast, args.slow)
     engine = TradingEngine(config, broker, strategy, journal, clock=clock)
     try:
@@ -63,11 +65,14 @@ async def run(args, journal):
                 return asdict(value) if is_dataclass(value) else str(value)
 
             rendered = json.dumps(report, indent=2, default=encode)
-            Path("runtime/diagnostics.json").write_text(rendered)
+            destination = (
+                Path("runtime/live") / config.account if config.mode == "live" else Path("runtime")
+            ) / "diagnostics.json"
+            destination.write_text(rendered)
             print(rendered)
             if not report["ready"]:
                 raise SafetyError(
-                    "Diagnostic checks blocked; see runtime/diagnostics.json. No orders submitted."
+                    f"Diagnostic checks blocked; see {destination}. No orders submitted."
                 )
             return
         print(json.dumps(await engine.cycle(), indent=2))
@@ -78,12 +83,15 @@ async def run(args, journal):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Paper-only IBKR system; no live mode")
+    parser = argparse.ArgumentParser(description="IBKR trading with per-order manual approval")
     parser.add_argument(
         "command",
         choices=("demo", "check", "trade", "journal", "reconcile", "simulate", "dashboard"),
     )
-    parser.add_argument("--config", default="config.local.json")
+    parser.add_argument("--config")
+    parser.add_argument("--environment", choices=("paper", "live"), default="paper")
+    parser.add_argument("--enable-live", action="store_true")
+    parser.add_argument("--live-config", default="runtime/config.live.json")
     parser.add_argument("--source", choices=("demo", "ibkr"), default="demo")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--key")
@@ -91,6 +99,18 @@ def main():
     parser.add_argument("--fast", type=int, default=20)
     parser.add_argument("--slow", type=int, default=50)
     args = parser.parse_args()
+    if (args.environment == "live" or args.enable_live) and args.command not in (
+        "trade",
+        "check",
+        "journal",
+        "reconcile",
+    ):
+        parser.error(
+            "Select environments for trade/check/journal/reconcile; the dashboard has its own account selector"
+        )
+    args.config = args.config or (
+        args.live_config if args.environment == "live" else "config.local.json"
+    )
     Path("runtime").mkdir(exist_ok=True)
     configure_logging("runtime/app.log")
     runtime = (
@@ -100,6 +120,11 @@ def main():
         if args.command == "dashboard"
         else Path("runtime")
     )
+    if args.environment == "live":
+        from .environments import load_config
+
+        config = load_config(args)
+        runtime = Path("runtime/live") / config.account
     runtime.mkdir(parents=True, exist_ok=True)
     if args.command == "simulate":
         from uuid import uuid4

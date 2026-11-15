@@ -1,5 +1,9 @@
 # Aegis portfolio dashboard
 
+The Paper/Real selector switches account views. Real orders require a separate
+explicitly opted-in terminal session and individual manual approval; see
+[LIVE_TRADING.md](LIVE_TRADING.md). The dashboard itself remains read-only.
+
 The dashboard is part of trading-monitoring, with a small composition entry point
 in the application. It is read-only and binds only to 127.0.0.1. No order creation,
 cancellation, approval or account-changing HTTP route exists.
@@ -42,7 +46,11 @@ rejects unsupported assets. No extra market-data subscription is requested here.
 - A read-only positions CSV export; missing values remain empty.
 - Connection and snapshot timestamps, with stale/disconnected warnings.
 
-Account collection runs every 15 seconds, browser refresh every 10 seconds. Missing
+Account collection targets a one-second cadence, with browser refresh every second.
+Slow collections never overlap; the next collection starts after the prior one
+finishes. Browser reads time out after five seconds and never overlap. Broker
+heartbeats remain 15 seconds apart to avoid rapid-heartbeat timeouts in Gateway.
+Prices and account values still update at IBKR's own cadence. Missing
 or unavailable broker values show a dash; there is no fabricated price fallback.
 Broker marks may be delayed, frozen, or from the last session. Values are display
 information, not execution quotes. Option average cost follows the broker's

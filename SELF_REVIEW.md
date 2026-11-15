@@ -193,3 +193,52 @@ coverage is 99.15%, and dependency audits report no known vulnerabilities. Two
 reviews found no unresolved blocker for this local ingestion scope. API vintage
 pagination, automated scheduling, complete fundamental normalization and signal
 feature joins remain planned. No brokerage configuration or execution code changed.
+
+## One-second refresh review 1 — collection cadence (15 November)
+
+Changed the collector to a one-second target measured from collection start.
+Slow collections remain sequential; failure still stops collection and preserves
+stale data. Broker price/account publication cadence is unchanged.
+
+## One-second refresh review 2 — display and recovery (15 November)
+
+Browser reads run every second, skip overlapping reads and time out after five
+seconds. Reviewed cleanup in finally so failures do not prevent future refreshes.
+All 72 offline tests and local quality gates pass; existing browser interaction
+checks pass. Runtime-only paper configuration remains private and read-only.
+Live acceptance caught repeated-heartbeat timeouts at the faster cadence. Kept
+heartbeats 15 seconds apart while collecting snapshots every second, added a
+regression case for heartbeat reuse/expiry and clearer timeout diagnostics, and
+reran all local gates successfully. Verified 22 distinct connected paper snapshots
+over approximately 24 seconds, including a subsequent heartbeat boundary.
+
+## Paper/Real review 1 — authorization and execution boundaries (15 November)
+
+The user explicitly authorized live execution with manual approval for each order,
+superseding the initial paper-only requirement. Kept paper defaults and separate
+PaperBroker/LiveBroker adapters; mode, localhost port, opt-in and exact managed
+account must agree. Live sessions require an explicit CLI flag, interactive
+terminal and a phrase binding LIVE/account/key/side/quantity/symbol/price. Injected
+approvers and paper approvals cannot authorize live orders. Recheck broker/config
+identity and mandatory risk after input; expiry, disconnect and STOP still block
+submission. Found that off-cent custom prices could be rounded in the approval
+prompt; rejected those live proposals and added a regression case. Uncertain
+sends remain reserved and cannot be retried. Live account keys, journals and locks
+are separate, preserving the existing paper journal. All order tests use fakes.
+
+## Paper/Real review 2 — presentation, isolation and packaging (15 November)
+
+Reviewed environment-specific snapshot routing, missing configuration, failed
+connections, rapid selection and history isolation. Selecting Real clears paper
+values immediately; late responses cannot replace the selected environment.
+Cleared chart date labels as well as values. Missing Real configuration has an
+explicit empty state and never falls back to paper data. The browser has no order
+submission or approval route; selecting a view cannot start/stop a terminal trading
+session. Both collectors remain read-only. Found potential dashboard/trader client
+ID collisions and allocated distinct bounded IDs, with a collector regression test.
+Bumped changed libraries and updated dependent versions/lock; checked independent
+and full wheel installs. All 88 guarded tests, browser checks, strict typing/style,
+per-library coverage gates and dependency audit pass. Risk, approval and execution
+have 100% combined coverage. These reviews do not replace required human review
+before merging critical execution changes. Live account configuration/login and
+live-order acceptance are not verified; no live orders were submitted.

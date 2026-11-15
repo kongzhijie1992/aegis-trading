@@ -55,6 +55,8 @@ class TradingEngine:
         last = max(b.time for b in bars if b.time + timedelta(minutes=5) <= now)
         # Retain legacy keys so existing consumed signals cannot be replayed.
         key = f"{symbol}-{side}-{last:%Y%m%dT%H%M}"
+        if self.config.mode == "live":
+            key = f"LIVE-{self.config.account}-{key}"
         return Proposal(key, symbol, side, 1, limit_price(quote, side), now)
 
     async def cycle(self, symbols=("SPY", "QQQ")):
@@ -80,7 +82,7 @@ class TradingEngine:
         self.broker.guard()
         report = {
             "time": self.clock.now().isoformat(),
-            "connection": "verified_paper",
+            "connection": "verified_" + self.config.mode,
             "read_only_diagnostics": True,
             "orders_submitted": 0,
             "checks": {},

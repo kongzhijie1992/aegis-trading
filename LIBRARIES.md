@@ -18,7 +18,7 @@ need separate Git repositories to be separately installable or versioned.
 | trading-execution | trading_execution | Rechecks, durable reservation, approved dispatch |
 | trading-monitoring | trading_monitoring | SQLite audit/status journal and rotating logs |
 | trading-simulation | trading_simulation | Deterministic offline fixture broker and clock |
-| trading-ibkr | trading_ibkr | Paper-only TWS socket adapter; owns ib_async dependency |
+| trading-ibkr | trading_ibkr | Explicit paper/live socket adapters; owns ib_async dependency |
 | trading-engine | trading_engine | Composition and independent diagnostic checks |
 
 The backtesting/simulation component currently supplies an execution simulator,

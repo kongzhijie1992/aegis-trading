@@ -1,0 +1,16 @@
+{
+  "mode": "live",
+  "live_enabled": true,
+  "host": "127.0.0.1",
+  "port": 4001,
+  "client_id": 81,
+  "account": "U_REPLACE_WITH_YOUR_EXACT_LIVE_ACCOUNT",
+  "max_order_usd": 1500,
+  "max_symbol_usd": 3000,
+  "max_gross_usd": 5000,
+  "max_daily_orders": 4,
+  "max_daily_loss_usd": 100,
+  "max_spread_bps": 20,
+  "approval_seconds": 30,
+  "kill_file": "runtime/live/STOP"
+}

@@ -180,3 +180,18 @@ with offline fixtures; account-local SEC_USER_AGENT and FRED_API_KEY are absent,
 so authenticated/contact-configured provider acceptance remains pending. No
 fundamental live download or complete historical coverage is claimed. No broker
 orders, subscriptions or account settings were changed.
+
+## Paper/Real selector and manual live capability — 15 November 2026
+
+Implemented separate Paper/Real snapshot views, empty unconfigured Real state,
+explicit opted-in live configuration/adapter and an interactive per-order approval
+path. The web dashboard remains read-only; live trading is an explicitly started
+terminal session. Added tests for mode/port/account mismatches, typed live approval,
+wrong/paper phrases, noninteractive/injected approval refusal, approval expiry,
+account mutation, kill/disconnect gates, exact displayed price, uncertainty and
+replay protection, fake live socket dispatch, and independent dashboard clients.
+All 88 guarded tests and local quality/coverage gates pass. Browser tests cover
+Paper/Real selection without leaking paper values, plus existing functionality.
+Clean wheel installs pass outside the source checkout. No live credentials or
+account configuration were committed, and no live order was sent. Real-account
+connection/acceptance remains pending exact user-provided live configuration.

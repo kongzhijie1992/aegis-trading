@@ -16,7 +16,19 @@ def main():
             data["as_of"] = (datetime.now(UTC) - timedelta(minutes=9 - i)).isoformat()
             data["net_liquidation"] -= (9 - i) * 10
             store.update(data)
-        server = start_server(store, 0)
+        live_store = DashboardStore(Path(folder) / "live.sqlite")
+        live_store.update(
+            {
+                **demo_snapshot(),
+                "mode": "live",
+                "account": "U123",
+                "positions": [],
+                "net_liquidation": None,
+                "status": "not_configured",
+                "error": "Real account is not configured",
+            }
+        )
+        server = start_server(store, 0, environments={"paper": store, "live": live_store})
         try:
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch()
@@ -29,6 +41,14 @@ def main():
                 )
                 assert page.locator("#positions tr").count() == 2
                 assert page.locator("#chart svg").count() == 1
+                page.get_by_role("button", name="Real", exact=True).click()
+                expect(page.locator("#mode")).to_contain_text("REAL MONEY")
+                expect(page.locator("#notice")).to_contain_text("not configured")
+                expect(page.locator("#nav")).to_have_text("—")
+                assert "SPY" not in page.locator("#positions").inner_text()
+                page.get_by_role("button", name="Paper", exact=True).click()
+                expect(page.locator("#mode")).to_contain_text("DEMO")
+                expect(page.locator("#positions")).to_contain_text("SPY")
                 page.get_by_label("Search positions").fill("QQQ")
                 assert page.locator("#positions tr").count() == 1
                 with page.expect_download() as download:
