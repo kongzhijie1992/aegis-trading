@@ -15,3 +15,9 @@ coverage.xml
 audit.json
 
 node_modules/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.env
+.env.*
+!.env.example

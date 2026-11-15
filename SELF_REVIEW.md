@@ -165,3 +165,31 @@ but the existing integer-target engine does not propagate SignalRecord expiry to
 submission; this is documented as a future integration requirement rather than
 claiming end-to-end expiry enforcement. Both reviews found no remaining blocker
 for the offline research scope. No account data or research outputs are committed.
+
+## Local data review 1 — release ordering and ingestion integrity (15 November)
+
+Reviewed exact decimal normalization, date/timestamp validation, period/unit
+separation, raw payload retention and transactional ingestion. Fixed ambiguous
+same-revision values within one batch and made batch identity include normalized
+rows. A late correction to an older release previously could outrank a newer
+release: preserved source release ordering separately from correction availability
+and added a regression case. Verified reversion history, duplicate imports,
+rollback after a partially processed batch, missing values, parameterized queries
+and system-versus-source cutoffs. Current-only downloads remain unavailable to
+past system queries. SEC/FRED date-only availability is explicitly a conservative
+proxy; no strict intraday point-in-time claim is made.
+
+## Local data review 2 — operations, isolation and delivery (15 November)
+
+Reviewed provider credentials, retries, response bounds, database upgrades,
+backup/restore and installed packages. Corrected the FRED CSV URL against a real
+download. Collection timestamps are captured after the complete response arrives.
+Schema changes run transactionally; ambiguous prototype corrections cannot migrate
+silently. Added sanitized nonzero CLI failures and ignored local databases/env
+files. The data wheel installs without the IBKR SDK/application; coverage discovery
+now checks every library dynamically. Both source and installed suites pass all
+72 tests, strict mypy covers 21 files, trading-data combined statement/branch
+coverage is 99.15%, and dependency audits report no known vulnerabilities. Two
+reviews found no unresolved blocker for this local ingestion scope. API vintage
+pagination, automated scheduling, complete fundamental normalization and signal
+feature joins remain planned. No brokerage configuration or execution code changed.

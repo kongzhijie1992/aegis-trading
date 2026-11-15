@@ -17,8 +17,9 @@ def main():
         possible = summary["num_statements"] + summary["num_branches"]
         a, b = totals.get(library, (0, 0))
         totals[library] = (a + covered, b + possible)
-    if len(totals) != 11:
-        raise RuntimeError("Coverage must include all 11 libraries")
+    expected = {p.parent.name for p in Path("libs").glob("*/pyproject.toml")}
+    if set(totals) != expected:
+        raise RuntimeError("Coverage must include every library: " + str(expected - set(totals)))
     failures = []
     for name, (covered, possible) in sorted(totals.items()):
         threshold = 95 if name in ("trading-risk", "trading-execution") else 90

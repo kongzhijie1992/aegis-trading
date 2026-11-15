@@ -1585,6 +1585,23 @@ type = "directory"
 url = "libs/trading-contracts"
 
 [[package]]
+name = "trading-data"
+version = "0.1.0"
+description = "Local revision-aware fundamental and macro data ingestion"
+optional = false
+python-versions = ">=3.12,<3.15"
+groups = ["main"]
+files = []
+develop = true
+
+[package.dependencies]
+tzdata = ">=2025.2"
+
+[package.source]
+type = "directory"
+url = "libs/trading-data"
+
+[[package]]
 name = "trading-engine"
 version = "0.1.0"
 description = "Component orchestration"
@@ -1801,4 +1818,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.15"
-content-hash = "ef4a0e6a90c65b934d4853b79695f0ca536979c2de9dd003662378a00231490c"
+content-hash = "77314b2a747c75ab259469f3a706d66dfab798ae486208202930ea5fa0bc7dc2"

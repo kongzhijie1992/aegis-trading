@@ -17,9 +17,10 @@ The current code is a tested starter, not a production-ready trading platform.
 | 9 | Monitoring | Read-only operational reports and structured events | [Plan](plans/trading-monitoring.md) |
 | 10 | IBKR | Fully typed adapter and controlled paper acceptance | [Plan](plans/trading-ibkr.md) |
 | 11 | Engine | Typed composition and bounded scheduling | [Plan](plans/trading-engine.md) |
+| 12 | Data | Local fundamentals/macro database and revision-safe ingestion | [Plan](plans/trading-data.md) |
 
 Monitoring and simulated adapter tests are developed alongside each stage.
-The numbered order describes dependencies, not eleven isolated waterfall projects.
+The numbered order describes dependencies, not twelve isolated waterfall projects.
 
 For **each deliverable**: write an API/design note and failure cases; implement
 one small change; add meaningful tests; run every applicable CI gate; perform
