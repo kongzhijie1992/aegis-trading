@@ -1555,7 +1555,7 @@ files = [
 
 [[package]]
 name = "trading-approval"
-version = "0.1.0"
+version = "0.2.0"
 description = "Individual typed order approval"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1564,7 +1564,7 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1572,7 +1572,7 @@ url = "libs/trading-approval"
 
 [[package]]
 name = "trading-contracts"
-version = "0.1.0"
+version = "0.2.0"
 description = "Shared immutable models and protocols"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1603,7 +1603,7 @@ url = "libs/trading-data"
 
 [[package]]
 name = "trading-engine"
-version = "0.1.0"
+version = "0.2.0"
 description = "Component orchestration"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1612,11 +1612,11 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
-trading-execution = "0.1.0"
-trading-marketdata = "0.1.0"
-trading-portfolio = "0.1.0"
-trading-risk = "0.1.0"
+trading-contracts = "0.2.0"
+trading-execution = "0.2.0"
+trading-marketdata = "0.1.1"
+trading-portfolio = "0.1.1"
+trading-risk = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1624,7 +1624,7 @@ url = "libs/trading-engine"
 
 [[package]]
 name = "trading-execution"
-version = "0.1.0"
+version = "0.2.0"
 description = "Approval and durable order dispatch"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1633,9 +1633,9 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-approval = "0.1.0"
-trading-contracts = "0.1.0"
-trading-risk = "0.1.0"
+trading-approval = "0.2.0"
+trading-contracts = "0.2.0"
+trading-risk = "0.2.0"
 tzdata = ">=2025.2"
 
 [package.source]
@@ -1644,8 +1644,8 @@ url = "libs/trading-execution"
 
 [[package]]
 name = "trading-ibkr"
-version = "0.1.0"
-description = "Local IBKR paper-only adapter"
+version = "0.2.0"
+description = "Explicit paper and live IBKR socket adapters"
 optional = false
 python-versions = ">=3.12,<3.15"
 groups = ["main"]
@@ -1654,7 +1654,7 @@ develop = true
 
 [package.dependencies]
 ib_async = "2.1.0"
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1662,7 +1662,7 @@ url = "libs/trading-ibkr"
 
 [[package]]
 name = "trading-marketdata"
-version = "0.1.0"
+version = "0.1.1"
 description = "Provider-neutral price data access and validation"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1671,7 +1671,7 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1679,7 +1679,7 @@ url = "libs/trading-marketdata"
 
 [[package]]
 name = "trading-monitoring"
-version = "0.1.0"
+version = "0.2.0"
 description = "Durable audit trail and operational logging"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1693,7 +1693,7 @@ url = "libs/trading-monitoring"
 
 [[package]]
 name = "trading-portfolio"
-version = "0.1.0"
+version = "0.1.1"
 description = "Positions, cash and target comparison"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1702,7 +1702,7 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1710,7 +1710,7 @@ url = "libs/trading-portfolio"
 
 [[package]]
 name = "trading-risk"
-version = "0.1.0"
+version = "0.2.0"
 description = "Mandatory trading risk gates"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1719,7 +1719,7 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 tzdata = ">=2025.2"
 
 [package.source]
@@ -1728,7 +1728,7 @@ url = "libs/trading-risk"
 
 [[package]]
 name = "trading-simulation"
-version = "0.1.0"
+version = "0.1.1"
 description = "Offline fixture broker and controlled clock"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1737,8 +1737,8 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
-trading-portfolio = "0.1.0"
+trading-contracts = "0.2.0"
+trading-portfolio = "0.1.1"
 
 [package.source]
 type = "directory"
@@ -1746,7 +1746,7 @@ url = "libs/trading-simulation"
 
 [[package]]
 name = "trading-strategy"
-version = "0.2.0"
+version = "0.2.1"
 description = "Pure signal generation"
 optional = false
 python-versions = ">=3.12,<3.15"
@@ -1755,7 +1755,7 @@ files = []
 develop = true
 
 [package.dependencies]
-trading-contracts = "0.1.0"
+trading-contracts = "0.2.0"
 
 [package.source]
 type = "directory"
@@ -1818,4 +1818,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.15"
-content-hash = "77314b2a747c75ab259469f3a706d66dfab798ae486208202930ea5fa0bc7dc2"
+content-hash = "6a6b16286178e869386f41575b1cb81181c68a7dd763dd7193ff0f3c6cb99c65"

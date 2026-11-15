@@ -63,6 +63,10 @@ def check(
         raise SafetyError("Starter strategy allows exactly one share per order")
     if not math.isfinite(proposal.limit) or proposal.limit <= 0:
         raise SafetyError("Invalid limit price")
+    if config.mode == "live" and Decimal(str(proposal.limit)) != Decimal(
+        str(proposal.limit)
+    ).quantize(Decimal("0.01")):
+        raise SafetyError("Live limit prices must match the displayed whole-cent approval price")
     if not timedelta(0) <= now - proposal.created <= timedelta(seconds=config.approval_seconds):
         raise SafetyError("Proposal expired; generate a new proposal")
     if not quote.live or not timedelta(0) <= now - quote.time <= timedelta(seconds=10):

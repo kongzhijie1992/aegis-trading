@@ -1,10 +1,10 @@
 [project]
 name = "trading-execution"
-version = "0.1.0"
+version = "0.2.0"
 description = "Approval and durable order dispatch"
 requires-python = ">=3.12,<3.15"
 readme = "README.md"
-dependencies = ["trading-contracts==0.1.0", "trading-risk==0.1.0", "trading-approval==0.1.0", "tzdata>=2025.2"]
+dependencies = ["trading-contracts==0.2.0", "trading-risk==0.2.0", "trading-approval==0.2.0", "tzdata>=2025.2"]
 
 [tool.poetry]
 packages = [{include = "trading_execution", from = "src"}]

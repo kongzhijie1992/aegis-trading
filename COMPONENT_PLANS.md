@@ -47,8 +47,10 @@ future work explicitly; a checked CI workflow is not evidence it has run remotel
 
 ## Scope constraints
 
-No live-order capability, unattended approval, automatic liquidation, public
-package publishing or external deployment is introduced by this plan. Existing
+Live-order capability was explicitly authorized on 15 November 2026; see
+[LIVE_TRADING.md](LIVE_TRADING.md) for opt-in and approval controls. Unattended
+approval, automatic liquidation, public package publishing and external deployment
+remain outside scope. Existing
 IBKR holdings/data restrictions remain effective. Historical backtest results
 will be labeled research and require costs, data provenance, point-in-time
 universes and out-of-sample validation before influencing paper-trading decisions.

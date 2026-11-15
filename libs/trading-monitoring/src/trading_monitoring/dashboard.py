@@ -8,6 +8,7 @@ from contextlib import closing
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 
 def finite(value):
@@ -109,7 +110,7 @@ def demo_snapshot():
     }
 
 
-def make_handler(store):
+def make_handler(store, environments=None):
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             if self.headers.get("Host") not in (
@@ -120,7 +121,17 @@ def make_handler(store):
                 return
             path = self.path.split("?", 1)[0]
             if path == "/api/snapshot":
-                body = json.dumps(store.snapshot(), allow_nan=False).encode()
+                selected = parse_qs(urlsplit(self.path).query).get("environment", [None])
+                if len(selected) != 1 or selected[0] not in (None, "paper", "live"):
+                    self.send_error(400)
+                    return
+                target = store
+                if selected[0] is not None:
+                    target = (environments or {"paper": store}).get(selected[0])
+                    if target is None:
+                        self.send_error(409)
+                        return
+                body = json.dumps(target.snapshot(), allow_nan=False).encode()
                 content_type = "application/json"
             elif path == "/":
                 body = Path(__file__).with_name("dashboard.html").read_bytes()
@@ -146,8 +157,8 @@ def make_handler(store):
     return Handler
 
 
-def start_server(store, port=8765):
-    server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(store))
+def start_server(store, port=8765, environments=None):
+    server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(store, environments))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     return server

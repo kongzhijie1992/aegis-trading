@@ -17,12 +17,20 @@ class Execution:
         return self.clock.now() if self.clock else datetime.now(UTC)
 
     async def execute(self, proposal, approve=None):
+        self.config.validate()
+        if getattr(self.broker, "config", self.config) != self.config:
+            raise SafetyError("Execution and broker configurations differ")
+        live = self.config.mode == "live"
+        if live and (approve is not None or type(self.approval) is not ConsoleApproval):
+            raise SafetyError("Live orders require an interactive ConsoleApproval for every order")
         if self.journal.seen(proposal.key) or self.journal.unresolved():
             raise SafetyError("Duplicate or unresolved prior order: reconcile before continuing")
         quote = await self.broker.quote(proposal.symbol)
         state = await self.broker.snapshot()
         self._check(proposal, quote, state)
-        if approve is None:
+        if live:
+            accepted = await ConsoleApproval("live").request(proposal, self.config.account)
+        elif approve is None:
             accepted = await self.approval.request(proposal, self.config.account)
         else:
             # Explicit injected approval reader for deterministic tests.
@@ -47,6 +55,8 @@ class Execution:
             raise
 
     def _check(self, proposal, quote, state):
+        if getattr(self.broker, "config", self.config) != self.config:
+            raise SafetyError("Broker account or environment changed; approval invalid")
         now = self.now()
         day = now.astimezone(ZoneInfo("America/New_York")).date().isoformat()
         context = (

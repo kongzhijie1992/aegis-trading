@@ -1,5 +1,9 @@
 # Aegis portfolio dashboard
 
+The Paper/Real selector switches account views. Real orders require a separate
+explicitly opted-in terminal session and individual manual approval; see
+[LIVE_TRADING.md](LIVE_TRADING.md). The dashboard itself remains read-only.
+
 The dashboard is part of trading-monitoring, with a small composition entry point
 in the application. It is read-only and binds only to 127.0.0.1. No order creation,
 cancellation, approval or account-changing HTTP route exists.

@@ -3,13 +3,14 @@
 import asyncio
 import tempfile
 import unittest
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, Mock
 
 from trading_contracts import Config, Proposal, SafetyError
-from trading_ibkr import PaperBroker
+from trading_ibkr import LiveBroker, PaperBroker
 from trading_monitoring import Journal
 
 
@@ -164,6 +165,32 @@ class AdapterContractTests(unittest.IsolatedAsyncioTestCase):
         trade.statusEvent.emit(trade)
         trade.fillEvent.emit(trade, NS(execution=NS(execId="fixture", shares=1, price=500)))
         self.assertEqual(self.journal.unresolved(), [])
+
+    async def test_live_adapter_uses_live_port_and_exact_account_with_fake_transport(self):
+        config = replace(self.config, mode="live", live_enabled=True, port=4001, account="U123")
+        broker = LiveBroker(config, self.journal)
+        broker.ib = self.ib
+        self.ib.managedAccounts = lambda: ["U123"]
+        await broker.connect()
+        self.assertEqual(self.ib.connectAsync.call_args.args, ("127.0.0.1", 4001))
+        self.assertTrue(self.ib.connectAsync.call_args.kwargs["readonly"])
+        proposal = Proposal("LIVE-U123-fake", "SPY", "BUY", 1, 500, datetime.now(UTC))
+        with self.assertRaises(SafetyError):
+            await broker.send_approved(proposal)
+        broker.writable = True
+        self.journal.reserve(proposal, "2026-11-13")
+        trade = NS(
+            order=NS(orderId=456),
+            orderStatus=NS(status="Filled", filled=1, remaining=0),
+            statusEvent=Event(),
+            fillEvent=Event(),
+            isDone=lambda: True,
+        )
+        self.ib.placeOrder = Mock(return_value=trade)
+        self.assertEqual(await broker.send_approved(proposal), "Filled")
+        order = self.ib.placeOrder.call_args.args[1]
+        self.assertEqual((order.account, order.orderType, order.tif), ("U123", "LMT", "DAY"))
+        self.assertFalse(order.outsideRth)
 
     async def test_readonly_account_view_displays_mixed_assets_without_relaxing_risk(self):
         self.ib.reqAccountUpdatesAsync = AsyncMock()

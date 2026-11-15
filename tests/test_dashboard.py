@@ -1,4 +1,5 @@
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -41,8 +42,8 @@ class DashboardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.store.update({**data, "cash": float("nan")})
 
-    def handler(self, path, host="127.0.0.1:8765"):
-        cls = make_handler(self.store)
+    def handler(self, path, host="127.0.0.1:8765", environments=None):
+        cls = make_handler(self.store, environments)
         handler = cls.__new__(cls)
         handler.server = NS(server_port=8765)
         handler.headers = {"Host": host}
@@ -53,6 +54,31 @@ class DashboardTests(unittest.TestCase):
         handler.end_headers = Mock()
         handler.send_error = Mock()
         return handler
+
+    def test_environment_queries_are_isolated_and_never_fall_back(self):
+        self.store.update(demo_snapshot())
+        live = DashboardStore(Path(self.tmp.name) / "live.sqlite")
+        live.update({**demo_snapshot(), "mode": "live", "account": "U123", "positions": []})
+        stores = {"paper": self.store, "live": live}
+        h = self.handler("/api/snapshot?environment=live", environments=stores)
+        h.do_GET()
+        result = json.loads(h.wfile.getvalue())
+        self.assertEqual(result["mode"], "live")
+        self.assertEqual(result["account"], "U123")
+        self.assertEqual(result["positions"], [])
+        for path in [
+            "/api/snapshot?environment=wrong",
+            "/api/snapshot?environment=paper&environment=live",
+        ]:
+            h = self.handler(path)
+            h.do_GET()
+            h.send_error.assert_called_once_with(400)
+        h = self.handler("/api/snapshot?environment=live")
+        h.do_GET()
+        h.send_error.assert_called_once_with(409)
+        h = self.handler("/api/snapshot?environment=paper")
+        h.do_GET()
+        self.assertEqual(json.loads(h.wfile.getvalue())["mode"], "demo")
 
     def test_readonly_routes_headers_and_host_rejection(self):
         for path in ("/", "/api/snapshot?refresh=1"):

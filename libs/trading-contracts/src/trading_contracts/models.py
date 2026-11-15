@@ -15,6 +15,7 @@ class Config:
     port: int = 7497
     client_id: int = 71
     account: str = ""
+    live_enabled: bool = False
     max_order_usd: float = 1500
     max_symbol_usd: float = 3000
     max_gross_usd: float = 5000
@@ -25,14 +26,22 @@ class Config:
     kill_file: str = "runtime/STOP"
 
     def validate(self) -> None:
-        if self.mode != "paper" or self.host != "127.0.0.1" or self.port not in (7497, 4002):
-            raise SafetyError("Only localhost paper ports 7497/4002 are permitted")
-        if not re.fullmatch(r"DU(?:R)?\d+", self.account):
-            raise SafetyError(
-                "Set the exact DU/DUR paper account; all other account formats fail closed"
-            )
-        if type(self.client_id) is not int or self.client_id <= 0:
-            raise SafetyError("Use a positive nonzero client ID")
+        if self.host != "127.0.0.1" or type(self.live_enabled) is not bool:
+            raise SafetyError("Use localhost and an explicit boolean live opt-in")
+        if self.mode == "paper":
+            if self.port not in (7497, 4002) or self.live_enabled:
+                raise SafetyError("Paper mode requires paper ports and live_enabled=false")
+            pattern = r"DU(?:R)?\d+"
+        elif self.mode == "live":
+            if self.port not in (7496, 4001) or not self.live_enabled:
+                raise SafetyError("Live mode requires live ports and live_enabled=true")
+            pattern = r"U\d+"
+        else:
+            raise SafetyError("Unknown trading environment")
+        if not re.fullmatch(pattern, self.account):
+            raise SafetyError("Exact account format must match the configured environment")
+        if type(self.client_id) is not int or not 0 < self.client_id <= 2_147_483_647:
+            raise SafetyError("Use a positive signed 32-bit client ID")
         for field in (
             "max_order_usd",
             "max_symbol_usd",

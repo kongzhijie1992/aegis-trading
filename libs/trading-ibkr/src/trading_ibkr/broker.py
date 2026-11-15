@@ -1,4 +1,4 @@
-"""Local TWS adapter; no live endpoint or automatic reconnect path."""
+"""Explicit paper/live socket adapters; no automatic reconnect or order retry."""
 
 import asyncio
 import math
@@ -9,10 +9,14 @@ from trading_contracts.models import Bar, Quote, SafetyError, Snapshot
 
 
 class PaperBroker:
+    environment = "paper"
+
     def __init__(self, config, journal, writable=False):
         from ib_async import IB
 
         config.validate()
+        if config.mode != self.environment:
+            raise SafetyError("Broker adapter and configured environment differ")
         self.config, self.journal, self.writable = config, journal, writable
         self.ib = IB()
         self.ib.RequestTimeout = 10
@@ -32,13 +36,13 @@ class PaperBroker:
 
     def guard(self):
         self.config.validate()
+        if self.config.mode != self.environment:
+            raise SafetyError("Broker environment changed; restart the session")
         accounts = self.ib.managedAccounts()
         if self.fault or not self.ib.isConnected():
             raise SafetyError("Disconnected/degraded session: restart and reconcile in TWS")
         if accounts != [self.config.account]:
-            raise SafetyError(
-                "Require exactly the configured DU paper account; mixed sessions refused"
-            )
+            raise SafetyError("Require exactly the configured account; mixed sessions refused")
 
     async def connect(self):
         await self.ib.connectAsync(
@@ -246,7 +250,7 @@ class PaperBroker:
                 }
             )
         return {
-            "mode": "paper",
+            "mode": self.environment,
             "status": "connected",
             "account": self.config.account,
             "currency": currency,
@@ -336,3 +340,9 @@ class PaperBroker:
 
     def close(self):
         self.ib.disconnect()
+
+
+class LiveBroker(PaperBroker):
+    """Explicit live adapter; only validated opted-in live configurations accepted."""
+
+    environment = "live"

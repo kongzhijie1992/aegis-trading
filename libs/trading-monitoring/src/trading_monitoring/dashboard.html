@@ -200,6 +200,13 @@
                 color: var(--text);
                 padding: 8px 12px;
             }
+            #paper-mode[aria-pressed="true"] {
+                border-color: var(--gold);
+            }
+            #live-mode[aria-pressed="true"] {
+                border-color: var(--red);
+                color: var(--red);
+            }
             button {
                 cursor: pointer;
             }
@@ -281,6 +288,22 @@
                     <span class="muted" id="account">Waiting for a snapshot…</span>
                 </div>
                 <div>
+                    <span role="group" aria-label="Account environment">
+                        <button
+                            id="paper-mode"
+                            aria-pressed="true"
+                            onclick="selectEnvironment('paper')"
+                        >
+                            Paper
+                        </button>
+                        <button
+                            id="live-mode"
+                            aria-pressed="false"
+                            onclick="selectEnvironment('live')"
+                        >
+                            Real
+                        </button>
+                    </span>
                     <button onclick="load()">↻ Refresh</button>
                     <button onclick="download()">Export positions</button>
                 </div>
@@ -392,6 +415,17 @@
         </main>
         <script>
             let state = { positions: [], orders: [] };
+            let environment = "paper";
+            function selectEnvironment(next) {
+                if (next === environment) return;
+                environment = next;
+                state = { mode: next, status: "starting", positions: [], orders: [], history: [] };
+                el("search").value = "";
+                el("paper-mode").setAttribute("aria-pressed", String(next === "paper"));
+                el("live-mode").setAttribute("aria-pressed", String(next === "live"));
+                render();
+                load();
+            }
             const el = (id) => document.getElementById(id);
             const esc = (s) =>
                 String(s ?? "—").replace(
@@ -431,6 +465,8 @@
             function chart() {
                 let h = state.history || [];
                 if (h.length < 2) {
+                    el("start").textContent = "—";
+                    el("end").textContent = "—";
                     el("chart").innerHTML =
                         '<div class="empty" style="height:220px">Collecting history — two snapshots are needed to draw the chart.</div>';
                     return;
@@ -452,7 +488,11 @@
             }
             function render() {
                 el("mode").textContent =
-                    (state.mode === "demo" ? "DEMO · SYNTHETIC" : "PAPER · READ ONLY") +
+                    (state.mode === "demo"
+                        ? "DEMO · SYNTHETIC"
+                        : state.mode === "live"
+                          ? "REAL MONEY · READ ONLY VIEW"
+                          : "PAPER · READ ONLY") +
                     " / " +
                     (state.status !== "connected" || state.age_seconds > 60
                         ? "stale"
@@ -467,11 +507,14 @@
                 pnl("realized", state.realized_pnl);
                 el("count").textContent = state.positions.length;
                 let stale = state.status !== "connected" || state.age_seconds > 60;
-                el("mode").style.color = stale ? "var(--red)" : "var(--green)";
+                el("mode").style.color =
+                    stale || state.mode === "live" ? "var(--red)" : "var(--green)";
                 el("notice").textContent = [
                     state.mode === "demo"
                         ? "DEMO DATA — illustrative portfolio, not your IBKR account."
-                        : "Read-only paper account snapshot. Position figures remain in each instrument’s currency.",
+                        : state.mode === "live"
+                          ? "REAL ACCOUNT. Switching views never submits orders. Live trading requires a separate session and typed approval for every order."
+                          : "Read-only paper account snapshot. Position figures remain in each instrument’s currency.",
                     stale ? "STALE / DISCONNECTED — last known values are retained." : "",
                     state.error || "",
                     ...(state.notes || []),
@@ -508,20 +551,26 @@
             async function load() {
                 if (loading) return;
                 loading = true;
+                const requestedEnvironment = environment;
                 try {
-                    const r = await fetch("/api/snapshot", {
+                    const r = await fetch("/api/snapshot?environment=" + requestedEnvironment, {
                         cache: "no-store",
                         signal: AbortSignal.timeout(5000),
                     });
                     if (!r.ok) throw Error("Snapshot request failed");
-                    state = await r.json();
+                    const snapshot = await r.json();
+                    if (environment !== requestedEnvironment) return;
+                    state = snapshot;
                     state.positions ||= [];
                     state.orders ||= [];
                     render();
                 } catch (e) {
+                    if (environment !== requestedEnvironment) return;
                     el("notice").textContent =
                         "Connection unavailable. Previously displayed values may be stale.";
-                    el("mode").textContent = "DISCONNECTED / STALE";
+                    el("mode").textContent =
+                        (environment === "live" ? "REAL MONEY" : "PAPER") +
+                        " / DISCONNECTED / STALE";
                 } finally {
                     loading = false;
                 }

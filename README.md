@@ -1,5 +1,9 @@
 # Aegis Trading
 
+Paper/Real account selector and explicitly opted-in manual live execution:
+[LIVE_TRADING.md](LIVE_TRADING.md). Paper is the default. The dashboard never
+submits orders; every live order requires its own exact terminal approval.
+
 Fundamental and macro database: [DATA_PLATFORM.md](DATA_PLATFORM.md). Inspect local
 data with `poetry run aegis-data inventory`; ingestion and backups are separate
 from the broker and order-approval process.
@@ -13,8 +17,8 @@ Portfolio dashboard: [DASHBOARD.md](DASHBOARD.md). Run
 
 A modular Python trading platform, starting with manually approved IBKR paper
 trading. Research, market data, portfolio accounting, risk and execution are
-independent libraries in one repository. Live trading and hosted deployment are
-future milestones; current execution remains paper-only.
+independent libraries in one repository. Hosted deployment remains a future
+milestone. Live execution requires explicit opt-in and per-order approval.
 
 Development roadmap: [COMPONENT_PLANS.md](COMPONENT_PLANS.md).
 Mandatory engineering gates: [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -46,7 +50,7 @@ poetry run paper-trader simulate
 
 
 
-Semi-automated research starter. **No live mode exists.** Every submitted order
+Semi-automated research starter. **Live mode requires explicit opt-in.** Every submitted order
 
 requires its own exact typed approval. The default `check` command is read-only.
 
@@ -380,7 +384,7 @@ protection, not a sandbox for arbitrarily modified code or a misconfigured broke
 
 See `VERIFICATION.md` for the checks actually performed and the remaining
 
-account-connected acceptance steps. No live orders are permitted or tested.
+account-connected acceptance steps. Live-order acceptance has not been run; automated tests use fakes only.
 
 
 

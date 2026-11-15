@@ -1,10 +1,10 @@
 [project]
 name = "trading-marketdata"
-version = "0.1.0"
+version = "0.1.1"
 description = "Provider-neutral price data access and validation"
 requires-python = ">=3.12,<3.15"
 readme = "README.md"
-dependencies = ["trading-contracts==0.1.0"]
+dependencies = ["trading-contracts==0.2.0"]
 
 [tool.poetry]
 packages = [{include = "trading_marketdata", from = "src"}]
