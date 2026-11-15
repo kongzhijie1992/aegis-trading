@@ -36,14 +36,20 @@ async def run_dashboard(args):
             broker = PaperBroker(config, journal, writable=False)
             await broker.connect()
         while True:
+            started = asyncio.get_running_loop().time()
             try:
-                store.update(demo_snapshot() if mode == "demo" else await broker.account_view())
+                store.update(
+                    demo_snapshot()
+                    if mode == "demo"
+                    else await broker.account_view(heartbeat_seconds=15)
+                )
             except Exception as exc:
                 store.fail(f"{type(exc).__name__}: {exc}. Restart after checking paper TWS.")
                 print("Dashboard collector stopped; last snapshot retained.", flush=True)
                 # Keep serving a stale snapshot; never reconnect automatically.
                 await asyncio.Event().wait()
-            await asyncio.sleep(15)
+            elapsed = asyncio.get_running_loop().time() - started
+            await asyncio.sleep(max(0, 1 - elapsed))
     finally:
         if broker:
             broker.close()

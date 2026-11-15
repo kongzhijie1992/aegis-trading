@@ -504,9 +504,15 @@
                         .join("") ||
                     '<tr><td colspan="6" class="empty">No open orders in this snapshot</td></tr>';
             }
+            let loading = false;
             async function load() {
+                if (loading) return;
+                loading = true;
                 try {
-                    const r = await fetch("/api/snapshot", { cache: "no-store" });
+                    const r = await fetch("/api/snapshot", {
+                        cache: "no-store",
+                        signal: AbortSignal.timeout(5000),
+                    });
                     if (!r.ok) throw Error("Snapshot request failed");
                     state = await r.json();
                     state.positions ||= [];
@@ -516,6 +522,8 @@
                     el("notice").textContent =
                         "Connection unavailable. Previously displayed values may be stale.";
                     el("mode").textContent = "DISCONNECTED / STALE";
+                } finally {
+                    loading = false;
                 }
             }
             function download() {
@@ -548,7 +556,7 @@
                 URL.revokeObjectURL(a.href);
             }
             load();
-            setInterval(load, 10000);
+            setInterval(load, 1000);
         </script>
     </body>
 </html>

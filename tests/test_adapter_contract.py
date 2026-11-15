@@ -214,9 +214,12 @@ class AdapterContractTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["realized_pnl"], 3)
         self.ib.reqPnL.return_value = NS(dailyPnL=0)
         self.ib.accountValues = lambda _: [NS(tag="NetLiquidation", currency="GBP", value="1e300")]
-        fallback = await self.broker.account_view()
+        fallback = await self.broker.account_view(heartbeat_seconds=15)
         self.assertEqual(fallback["currency"], "GBP")
         self.assertIsNone(fallback["net_liquidation"])
+        self.assertEqual(self.ib.reqCurrentTimeAsync.await_count, 1)
+        self.broker._last_dashboard_heartbeat -= 16
+        await self.broker.account_view(heartbeat_seconds=15)
         self.assertEqual(self.ib.reqCurrentTimeAsync.await_count, 2)
         self.ib.reqAccountUpdatesAsync.assert_not_awaited()
 

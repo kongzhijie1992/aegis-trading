@@ -193,3 +193,21 @@ coverage is 99.15%, and dependency audits report no known vulnerabilities. Two
 reviews found no unresolved blocker for this local ingestion scope. API vintage
 pagination, automated scheduling, complete fundamental normalization and signal
 feature joins remain planned. No brokerage configuration or execution code changed.
+
+## One-second refresh review 1 — collection cadence (15 November)
+
+Changed the collector to a one-second target measured from collection start.
+Slow collections remain sequential; failure still stops collection and preserves
+stale data. Broker price/account publication cadence is unchanged.
+
+## One-second refresh review 2 — display and recovery (15 November)
+
+Browser reads run every second, skip overlapping reads and time out after five
+seconds. Reviewed cleanup in finally so failures do not prevent future refreshes.
+All 72 offline tests and local quality gates pass; existing browser interaction
+checks pass. Runtime-only paper configuration remains private and read-only.
+Live acceptance caught repeated-heartbeat timeouts at the faster cadence. Kept
+heartbeats 15 seconds apart while collecting snapshots every second, added a
+regression case for heartbeat reuse/expiry and clearer timeout diagnostics, and
+reran all local gates successfully. Verified 22 distinct connected paper snapshots
+over approximately 24 seconds, including a subsequent heartbeat boundary.

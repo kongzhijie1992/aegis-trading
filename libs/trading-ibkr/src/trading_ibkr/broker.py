@@ -168,16 +168,25 @@ class PaperBroker:
             sum(not t.isDone() for t in orders),
         )
 
-    async def account_view(self):
+    async def account_view(self, heartbeat_seconds=0):
         """Read-only display of all assets; never relaxes snapshot() trading gates."""
         self.guard()
         # connectAsync synchronizes and subscribes to account updates once.
         # Re-subscribing to the same account need not produce another download-end
         # callback in TWS, so use a bounded heartbeat and the maintained stream.
-        await asyncio.wait_for(self.ib.reqCurrentTimeAsync(), 10)
+        now = asyncio.get_running_loop().time()
+        if now - getattr(self, "_last_dashboard_heartbeat", float("-inf")) >= heartbeat_seconds:
+            try:
+                await asyncio.wait_for(self.ib.reqCurrentTimeAsync(), 10)
+            except TimeoutError:
+                raise TimeoutError("Dashboard heartbeat timed out") from None
+            self._last_dashboard_heartbeat = now
         values = self.ib.accountValues(self.config.account)
         portfolio = self.ib.portfolio(self.config.account)
-        orders = await asyncio.wait_for(self.ib.reqAllOpenOrdersAsync(), 10)
+        try:
+            orders = await asyncio.wait_for(self.ib.reqAllOpenOrdersAsync(), 10)
+        except TimeoutError:
+            raise TimeoutError("Dashboard open-orders refresh timed out") from None
         currency = next(
             (v.value for v in values if v.tag == "Currency" and v.currency == "BASE"), None
         )
